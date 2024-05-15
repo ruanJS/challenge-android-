@@ -1,7 +1,12 @@
 const express = require('express');
-const router = express.Router();
+const router = express();
 const bcrypt = require('bcryptjs');
 const database = require('./database');
+console.log(database)
+
+router.get('/', (request, response) => {
+  response.status(200).send("Acessado o servidor");
+})
 
 router.post('/register', async (req, res) => {
   try {
