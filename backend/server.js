@@ -2,7 +2,6 @@ const express = require('express');
 const router = express();
 const bcrypt = require('bcryptjs');
 const database = require('./database');
-console.log(database)
 
 router.get('/', (request, response) => {
   response.status(200).send("Acessado o servidor");
@@ -53,6 +52,9 @@ router.post('/login', async (req, res) => {
     }
 
     // Verificar se a senha fornecida corresponde à senha armazenada no banco de dados
+    if (!user.PASSWORD) {
+      return res.status(401).json({ error: 'Credenciais inválidas' });
+    }
     const isPasswordValid = await bcrypt.compare(password, user.PASSWORD);
     if (!isPasswordValid) {
       return res.status(401).json({ error: 'Credenciais inválidas' });
@@ -71,21 +73,6 @@ router.post('/reset-password', async (req, res) => {
   try {
     const { email, newPassword } = req.body;
     
-    // Verificar se o email e a nova senha foram fornecidos
-    if (!email || !newPassword) {
-      return res.status(400).json({ error: 'Por favor, forneça um email e uma nova senha.' });
-    }
-
-    // Verificar se o email é válido
-    if (!isValidEmail(email)) {
-      return res.status(400).json({ error: 'Por favor, forneça um email válido.' });
-    }
-
-    // Verificar se a nova senha atende aos requisitos de segurança (por exemplo, comprimento mínimo)
-    if (newPassword.length < 8) {
-      return res.status(400).json({ error: 'A nova senha deve ter no mínimo 8 caracteres.' });
-    }
-
     // Hash da nova senha
     const hashedPassword = await bcrypt.hash(newPassword, 10);
 
@@ -107,7 +94,7 @@ router.post('/reset-password', async (req, res) => {
 router.get('/users', async (req, res) => {
   try {
     // Consultar o banco de dados para obter todos os usuários
-    const users = await database.getAllUsers();
+    const users = await database.query('SELECT * FROM USERS');
 
     // Enviar a lista de usuários como resposta
     res.json(users);
@@ -116,12 +103,5 @@ router.get('/users', async (req, res) => {
     res.status(500).json({ error: 'Erro interno do servidor' });
   }
 });
-
-// Função para verificar se o email é válido
-function isValidEmail(email) {
-  // Implemente sua lógica de validação de email aqui, se necessário
-  return true; // Exemplo simples de validação, sempre retorna true
-}
-
 
 module.exports = router;

@@ -28,7 +28,32 @@ async function getConnection() {
   }
 }
 
+async function query(sql, binds = [], options = {}) {
+  let connection;
+  let result;
+  options.outFormat = oracledb.OUT_FORMAT_OBJECT;
+  options.autoCommit = true;
+
+  try {
+    connection = await getConnection();
+    result = await connection.execute(sql, binds, options);
+    return result.rows;
+  } catch (error) {
+    console.error('Erro ao executar a consulta:', error);
+    throw error;
+  } finally {
+    if (connection) {
+      try {
+        await connection.close();
+      } catch (error) {
+        console.error('Erro ao fechar a conexão:', error);
+      }
+    }
+  }
+}
+
 module.exports = {
   initialize,
-  getConnection
+  getConnection,
+  query
 };
