@@ -1,7 +1,9 @@
-POST http://127.0.0.1:80/server/register HTTP/1.1
+POST http://localhost:80/server/register HTTP/1.1
 Content-Type: application/json
 
 {
-  "email": "teste@teste.com",
-  "password": "1234"
+  "name": "usuario 1",
+  "email": "usuario1@example.com",
+  "password": "12345",
+  "phone": "113456789"
 }
